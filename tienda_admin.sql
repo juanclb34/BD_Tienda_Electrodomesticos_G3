@@ -196,3 +196,6 @@ SELECT * FROM Inventario;
 SELECT * FROM Pedido;
 
 SELECT * FROM Factura;
+
+
+SELECT table_name FROM user_tables;

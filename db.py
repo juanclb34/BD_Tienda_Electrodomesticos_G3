@@ -19,21 +19,12 @@ def obtener_productos():
     conn = get_connection()
     cursor = conn.cursor()
 
-    query = """
-    SELECT 
-        p.idProducto,
-        p.nombre,
-        m.nombre AS Marca,
-        c.nombre AS Categoria,
-        i.cantidadDisponible,
-        i.costoUnitario
-    FROM Producto p JOIN Marca m ON p.idMarca = m.idMarca
-    JOIN Categoria c ON p.idCategoria = c.idCategoria
-    JOIN Inventario i ON p.idProducto = i.idProducto"""
+    ref_cursor = conn.cursor()
 
-    cursor.execute(query)
-    datos = cursor.fetchall()
+    cursor.callproc("pqProductos.MostrarProductos", [ref_cursor])
+    datos = ref_cursor.fetchall()
 
+    ref_cursor.close()
     cursor.close()
     conn.close()
 

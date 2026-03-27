@@ -6,7 +6,7 @@ CREATE OR REPLACE PACKAGE pqProductos AS
         JOIN Categoria c ON p.idCategoria = c.idCategoria
         JOIN Inventario i ON p.idProducto = i.idProducto;
 
-    PROCEDURE MostrarProductos;
+    PROCEDURE MostrarProductos(p_cursor OUT SYS_REFCURSOR);
     PROCEDURE BuscarProducto(p_criterio VARCHAR2);
     PROCEDURE EliminarProducto(p_idProducto NUMBER);
     PROCEDURE InsertarInventario(p_idProd NUMBER, p_idProv NUMBER, p_cant NUMBER, p_min NUMBER, p_costo NUMBER);
@@ -16,12 +16,14 @@ END pqProductos;
 /
 
 CREATE OR REPLACE PACKAGE BODY pqProductos AS
-    PROCEDURE MostrarProductos IS
+    PROCEDURE MostrarProductos(p_cursor OUT SYS_REFCURSOR) IS
     BEGIN
-        FOR r IN cur_todos_productos 
-        LOOP
-            DBMS_OUTPUT.PUT_LINE('ID: '||r.idProducto||' | '||r.nombre||' | Stock: '||r.cantidadDisponible);
-        END LOOP;
+        OPEN p_cursor FOR
+            SELECT p.idProducto, p.nombre, m.nombre, c.nombre, i.cantidadDisponible, i.costoUnitario
+            FROM Producto p
+            JOIN Marca m ON p.idMarca = m.idMarca
+            JOIN Categoria c ON p.idCategoria = c.idCategoria
+            JOIN Inventario i ON p.idProducto = i.idProducto;
     END;
 
     PROCEDURE BuscarProducto(p_criterio VARCHAR2) IS

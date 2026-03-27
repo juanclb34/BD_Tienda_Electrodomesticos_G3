@@ -43,6 +43,7 @@ BEGIN
     END LOOP;
 END;
 /
+
 CREATE OR REPLACE TRIGGER trigger_calcular_factura_completa
 BEFORE INSERT ON Factura FOR EACH ROW
 DECLARE
@@ -56,6 +57,7 @@ BEGIN
     :NEW.total := v_subtotal + (v_subtotal * 0.13);
 END;
 /
+
 CREATE OR REPLACE TRIGGER trigger_actualizar_estado_pedido
 AFTER INSERT ON Pago FOR EACH ROW
 DECLARE

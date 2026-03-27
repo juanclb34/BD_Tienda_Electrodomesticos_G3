@@ -34,7 +34,7 @@ FUNCTION crearPedido(p_idUsuario NUMBER) RETURN NUMBER IS
 BEGIN
     SELECT NVL(MAX(idPedido),0)+1 INTO v_idPedido FROM Pedido;
 
-    INSERT INTO Pedido(idPedido,idUsuario,estado,fechaPedido)
+    INSERT INTO Pedido(idPedido,idUsuario,estado,fecha)
     VALUES(v_idPedido,p_idUsuario,'PENDIENTE',SYSDATE);
 
     RETURN v_idPedido;
@@ -48,20 +48,18 @@ PROCEDURE agregarProductoPedido(
 ) IS
     v_precio NUMBER;
 BEGIN
-    SELECT precioUnitario
+    SELECT costoUnitario
     INTO v_precio
     FROM Inventario
     WHERE idProducto = p_idProducto;
 
     INSERT INTO DetallePedido(
-        idDetalle,
         idPedido,
         idProducto,
         cantidad,
         precioUnitario
     )
     VALUES(
-        NVL((SELECT MAX(idDetalle)+1 FROM DetallePedido),1),
         p_idPedido,
         p_idProducto,
         p_cantidad,

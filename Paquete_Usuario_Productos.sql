@@ -69,6 +69,7 @@ CREATE OR REPLACE PACKAGE BODY pqProductos AS
     END;
 END pqProductos;
 /
+
 CREATE OR REPLACE PACKAGE pqUsuarios AS
     CURSOR cur_todos_usuarios IS 
         SELECT u.idUsuario, u.nombre, u.apellido1, u.correo, r.nombre AS nombre_rol
@@ -130,3 +131,4 @@ CREATE OR REPLACE PACKAGE BODY pqUsuarios AS
     END;
 END pqUsuarios;
 /
+

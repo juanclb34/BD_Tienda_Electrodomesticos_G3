@@ -29,3 +29,34 @@ def obtener_productos():
     conn.close()
 
     return datos
+
+def buscar_productos(criterio):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    ref_cursor = conn.cursor()
+
+    cursor.callproc("pqProductos.BuscarProducto", [criterio, ref_cursor])
+    datos = ref_cursor.fetchall()
+
+    ref_cursor.close()
+    cursor.close()
+    conn.close()
+
+    return datos
+
+def obtener_usuarios():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    ref_cursor = conn.cursor()
+
+    cursor.callproc("pqUsuarios.ListarUsuarios", [ref_cursor])
+    datos = ref_cursor.fetchall()
+
+    ref_cursor.close()
+    cursor.close()
+    conn.close()
+
+    return datos
+

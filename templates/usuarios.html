@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Usuarios ElectroTienda</h2>
+
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Apellido</th>
+    <th>Correo</th>
+    <th>Rol</th>
+    <th>Acción</th>
+</tr>
+
+{% for u in usuarios %}
+<tr>
+    <td>{{ u[0] }}</td>
+    <td>{{ u[1] }}</td>
+    <td>{{ u[2] }}</td>
+    <td>{{ u[3] }}</td>
+    <td>{{ u[4] }}</td>
+    <td>
+        <a href="/eliminar_usuario/{{ u[0] }}">Eliminar</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<h3>Crear Usuario</h3>
+
+<form method="POST" action="/crear_usuario">
+    Nombre: <input name="nombre"><br>
+    Apellido: <input name="apellido"><br>
+    Correo: <input name="correo"><br>
+    Password: <input name="password"><br>
+    <button type="submit">Crear</button>
+</form>
+
+{% endblock %}

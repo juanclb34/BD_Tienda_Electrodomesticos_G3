@@ -1,31 +1,53 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Productos</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Productos de la tienda</h1>
+{% block content %}
+
+<h2>Productos ElectroTienda</h2>
+
+<form method="POST" action="/buscar">
+    <input type="text" name="criterio" placeholder="Buscar producto..." required>
+    <button type="submit">Buscar</button>
+</form>
+
+{% if mensaje %}
+    <p>{{ mensaje }}</p>
+{% endif %}
 
 <table border="1">
-    <tr>
-        <th>Nombre</th>
-        <th>Marca</th>
-        <th>Categoría</th>
-        <th>Stock</th>
-        <th>Precio</th>
-    </tr>
+<tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Marca</th>
+    <th>Categoria</th>
+    <th>Stock</th>
+    <th>Precio</th>
+    <th>Acción</th>
+</tr>
 
-    {% for p in productos %}
-    <tr>
-        <td>{{ p[0] }}</td>
-        <td>{{ p[1] }}</td>
-        <td>{{ p[2] }}</td>
-        <td>{{ p[3] }}</td>
-        <td>{{ p[4] }}</td>
-    </tr>
-    {% endfor %}
+{% for p in productos %}
+<tr>
+    <td>{{ p[0] }}</td>
+    <td>{{ p[1] }}</td>
+    <td>{{ p[2] }}</td>
+    <td>{{ p[3] }}</td>
+    <td>{{ p[4] }}</td>
+    <td>{{ p[5] }}</td>
+    <td>
+        <a href="/eliminar_producto/{{ p[0] }}">Eliminar</a>
+    </td>
+</tr>
+{% endfor %}
 </table>
 
-</body>
-</html>
+<h3>Agregar Inventario</h3>
+
+<form method="POST" action="/agregar_producto">
+    ID Producto: <input name="idProd"><br>
+    ID Proveedor: <input name="idProv"><br>
+    Cantidad: <input name="cantidad"><br>
+    Minimo: <input name="minimo"><br>
+    Costo: <input name="costo"><br>
+    <button type="submit">Agregar</button>
+</form>
+
+{% endblock %}

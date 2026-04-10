@@ -7,7 +7,7 @@ CREATE OR REPLACE PACKAGE pqProductos AS
         JOIN Inventario i ON p.idProducto = i.idProducto;
 
     PROCEDURE MostrarProductos(p_cursor OUT SYS_REFCURSOR);
-    PROCEDURE BuscarProducto(p_criterio VARCHAR2);
+    PROCEDURE BuscarProducto(p_criterio VARCHAR2,p_cursor OUT SYS_REFCURSOR);
     PROCEDURE EliminarProducto(p_idProducto NUMBER);
     PROCEDURE InsertarInventario(p_idProd NUMBER, p_idProv NUMBER, p_cant NUMBER, p_min NUMBER, p_costo NUMBER);
     FUNCTION InfoProducto(p_idProducto NUMBER) RETURN SYS_REFCURSOR;
@@ -26,15 +26,16 @@ CREATE OR REPLACE PACKAGE BODY pqProductos AS
             JOIN Inventario i ON p.idProducto = i.idProducto;
     END;
 
-    PROCEDURE BuscarProducto(p_criterio VARCHAR2) IS
+    PROCEDURE BuscarProducto(p_criterio VARCHAR2,p_cursor OUT SYS_REFCURSOR) IS
     BEGIN
-        FOR r IN (SELECT p.nombre, m.nombre as Marca 
-                  FROM Producto p JOIN Marca m ON p.idMarca = m.idMarca
-                  WHERE UPPER(p.nombre) LIKE '%'||UPPER(p_criterio)||'%' 
-                  OR UPPER(m.nombre) LIKE '%'||UPPER(p_criterio)||'%') 
-                  LOOP
-            DBMS_OUTPUT.PUT_LINE('Encontrado: ' || r.nombre || ' (' || r.Marca || ')');
-        END LOOP;
+        OPEN p_cursor FOR
+            SELECT p.idProducto, p.nombre, m.nombre, c.nombre, i.cantidadDisponible, i.costoUnitario
+            FROM Producto p JOIN Marca m ON p.idMarca = m.idMarca
+            JOIN Categoria c ON p.idCategoria = c.idCategoria
+            JOIN Inventario i ON p.idProducto = i.idProducto
+            WHERE UPPER(p.nombre) LIKE '%'||UPPER(p_criterio)||'%' 
+            OR UPPER(m.nombre) LIKE '%'||UPPER(p_criterio)||'%'
+            OR UPPER(c.nombre) LIKE '%'||UPPER(p_criterio)||'%';
     END;
 
     PROCEDURE EliminarProducto(p_idProducto NUMBER) IS
@@ -78,7 +79,7 @@ CREATE OR REPLACE PACKAGE pqUsuarios AS
         FROM Usuario u 
         JOIN Rol r ON u.idRol = r.idRol;
 
-    PROCEDURE ListarUsuarios;
+    PROCEDURE ListarUsuarios(p_cursor OUT SYS_REFCURSOR);
     PROCEDURE CrearUsuario(p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_correo VARCHAR2, p_password VARCHAR2);
     PROCEDURE ActualizarUsuario(p_idUsuario NUMBER, p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_correo VARCHAR2, p_telefono VARCHAR2, p_direccion VARCHAR2);
     PROCEDURE EliminarUsuario(p_idUsuario NUMBER);
@@ -87,12 +88,12 @@ END pqUsuarios;
 /
 
 CREATE OR REPLACE PACKAGE BODY pqUsuarios AS
-    PROCEDURE ListarUsuarios IS
+    PROCEDURE ListarUsuarios(p_cursor OUT SYS_REFCURSOR) IS
     BEGIN
-        FOR r IN cur_todos_usuarios 
-        LOOP
-            DBMS_OUTPUT.PUT_LINE('ID: '||r.idUsuario||' | '||r.nombre||' '||r.apellido1||' | Rol: '||r.nombre_rol);
-        END LOOP;
+        OPEN p_cursor FOR
+            SELECT u.idUsuario, u.nombre, u.apellido1, u.apellido2, u.correo, r.nombre AS nombre_rol
+            FROM Usuario u 
+            JOIN Rol r ON u.idRol = r.idRol;
     END;
 
     PROCEDURE CrearUsuario(p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_correo VARCHAR2, p_password VARCHAR2) IS
@@ -133,4 +134,3 @@ CREATE OR REPLACE PACKAGE BODY pqUsuarios AS
     END;
 END pqUsuarios;
 /
-

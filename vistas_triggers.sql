@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW vista_productos_completa AS
-SELECT p.idProducto, p.nombre AS Producto, m.nombre AS Marca, c.nombre AS Categoria, i.cantidadDisponible, i.costoUnitario, i.cantidadMinima
+SELECT p.idProducto, p.nombre AS Producto, m.nombre AS Marca, c.nombre AS Categoria, p.descripcion, i.cantidadDisponible, i.costoUnitario, i.cantidadMinima
 FROM Producto p
 JOIN Marca m ON p.idMarca = m.idMarca
 JOIN Categoria c ON p.idCategoria = c.idCategoria

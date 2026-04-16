@@ -269,11 +269,7 @@ BEGIN
     SET CANTIDADDISPONIBLE = CANTIDADDISPONIBLE + p_cantidad,
         ULTIMAFECHAINGRESO = SYSDATE
     WHERE IDPRODUCTO = p_idProducto;
-
-    IF SQL%ROWCOUNT = 0 THEN
-        RAISE_APPLICATION_ERROR(-20021,'Producto no existe en inventario');
-    END IF;
-
+    COMMIT;
 END;
 
 -- Ajuste manual
@@ -311,11 +307,7 @@ BEGIN
     UPDATE INVENTARIO
     SET COSTOUNITARIO = p_precio
     WHERE IDPRODUCTO = p_idProducto;
-
-    IF SQL%ROWCOUNT = 0 THEN
-        RAISE_APPLICATION_ERROR(-20024,'Producto no encontrado');
-    END IF;
-
+    COMMIT;
 END;
 
 -- Función consultar stock

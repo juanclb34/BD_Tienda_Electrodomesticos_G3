@@ -9,6 +9,8 @@
     <button type="submit">Buscar</button>
 </form>
 
+<br>
+
 {% if mensaje %}
     <p>{{ mensaje }}</p>
 {% endif %}
@@ -21,33 +23,80 @@
     <th>Categoria</th>
     <th>Stock</th>
     <th>Precio</th>
-    <th>Acción</th>
 </tr>
 
 {% for p in productos %}
 <tr>
     <td>{{ p[0] }}</td>
-    <td>{{ p[1] }}</td>
+    <td>
+        <a href="/producto/{{ p[0] }}">
+            {{ p[1] }}
+        </a>
+    </td>
     <td>{{ p[2] }}</td>
     <td>{{ p[3] }}</td>
     <td>{{ p[4] }}</td>
     <td>{{ p[5] }}</td>
-    <td>
-        <a href="/eliminar_producto/{{ p[0] }}">Eliminar</a>
-    </td>
 </tr>
 {% endfor %}
 </table>
 
-<h3>Agregar Inventario</h3>
+{% if producto_seleccionado %}
 
-<form method="POST" action="/agregar_producto">
-    ID Producto: <input name="idProd"><br>
-    ID Proveedor: <input name="idProv"><br>
-    Cantidad: <input name="cantidad"><br>
-    Minimo: <input name="minimo"><br>
-    Costo: <input name="costo"><br>
-    <button type="submit">Agregar</button>
+<hr>
+<h3>Detalle del Producto</h3>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Marca</th>
+        <th>Categoria</th>
+        <th>Descripción</th>
+        <th>Stock</th>
+        <th>Precio</th>
+        <th>Cantidad Minima</th>
+    </tr>
+
+    <tr>
+        <td>{{ producto_seleccionado[0] }}</td>
+        <td>{{ producto_seleccionado[1] }}</td>
+        <td>{{ producto_seleccionado[2] }}</td>
+        <td>{{ producto_seleccionado[3] }}</td>
+        <td>{{ producto_seleccionado[4] }}</td>
+        <td>{{ producto_seleccionado[5] }}</td>
+        <td>{{ producto_seleccionado[6] }}</td>
+        <td>{{ producto_seleccionado[7] }}</td>
+    </tr>
+</table>
+
+<hr>
+
+<h4>Acciones</h4>
+
+<form action="/aumentarStock/{{ producto_seleccionado[0] }}" method="post">
+    <label>Agregar Stock:</label>
+    <input type="number" name="cantidad" min="1" required>
+    <button type="submit">Actualizar</button>
 </form>
+
+<br>
+
+<form action="/actualizarPrecio/{{ producto_seleccionado[0] }}" method="post">
+    <label>Nuevo Precio:</label>
+    <input type="number" step="0.01" name="precio" min="1" required>
+    <button type="submit">Actualizar</button>
+</form>
+
+<br>
+
+<form action="/eliminarProducto/{{ producto_seleccionado[0] }}" method="post">
+    <button type="submit"
+        onclick="return confirm('¿Está seguro que quiere eliminar el producto?')">
+        Eliminar Producto
+    </button>
+</form>
+
+{% endif %}
 
 {% endblock %}

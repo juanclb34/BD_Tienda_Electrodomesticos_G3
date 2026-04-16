@@ -8,9 +8,9 @@
 <tr>
     <th>ID</th>
     <th>Nombre</th>
-    <th>Apellido</th>
+    <th>Apellido1</th>
+    <th>Apellido2</th>
     <th>Correo</th>
-    <th>Rol</th>
     <th>Acción</th>
 </tr>
 
@@ -22,20 +22,25 @@
     <td>{{ u[3] }}</td>
     <td>{{ u[4] }}</td>
     <td>
-        <a href="/eliminar_usuario/{{ u[0] }}">Eliminar</a>
+        <form action="/eliminarUsuario/{{ u[0] }}" method="post" style="display:inline;">
+            <button type="submit"
+                onclick="return confirm('¿Esta seguro que desea eliminar el usuario? Tenga en cuenta que se eliminaran todos los pedidos asociados a este usuario')">
+                Eliminar
+            </button>
+        </form>
     </td>
 </tr>
 {% endfor %}
 </table>
 
-<h3>Crear Usuario</h3>
+{% if request.args.get('msg') == 'eliminado' %}
+    <p>Usuario y pedidos asociados eliminados correctamente</p>
+{% endif %}
 
-<form method="POST" action="/crear_usuario">
-    Nombre: <input name="nombre"><br>
-    Apellido: <input name="apellido"><br>
-    Correo: <input name="correo"><br>
-    Password: <input name="password"><br>
-    <button type="submit">Crear</button>
-</form>
+<br>
+
+<a href="/crearUsuario">
+    <button>Crear Usuario</button>
+</a>
 
 {% endblock %}

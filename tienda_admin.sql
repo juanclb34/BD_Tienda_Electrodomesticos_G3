@@ -191,11 +191,44 @@ SELECT * FROM Usuario;
 
 SELECT * FROM Producto;
 
+SELECT * FROM Marca;
+
+SELECT * FROM Categoria;
+
 SELECT * FROM Inventario;
 
+SELECT * FROM Proveedor;
+
 SELECT * FROM Pedido;
+
+SELECT * FROM detallePedido;
 
 SELECT * FROM Factura;
 
 
 SELECT table_name FROM user_tables;
+
+
+
+
+
+
+INSERT INTO Producto (idMarca,idCategoria,nombre,modelo,descripcion) 
+VALUES (2,3,'Apple Watch','Series 7','Reloj Inteligente');
+
+COMMIT;
+
+INSERT INTO Inventario (idProducto,idProveedor,cantidadDisponible,cantidadMinima,costoUnitario,ultimaFechaIngreso) 
+VALUES (22,1,20,5,300.00,SYSDATE);
+
+INSERT INTO Pedido (idUsuario,fecha,estado) VALUES (22,SYSDATE,'En proceso');
+
+INSERT INTO DetallePedido VALUES (21,3,1,200.00);
+
+COMMIT;
+
+DELETE FROM Pedido WHERE idUsuario = 22
+
+BEGIN
+    pqUsuarios.EliminarUsuario(22);
+END;

@@ -9,7 +9,6 @@ CREATE OR REPLACE PACKAGE pqProductos AS
     PROCEDURE MostrarProductos(p_cursor OUT SYS_REFCURSOR);
     PROCEDURE BuscarProducto(p_criterio VARCHAR2,p_cursor OUT SYS_REFCURSOR);
     PROCEDURE EliminarProducto(p_idProducto NUMBER);
-    PROCEDURE InsertarInventario(p_idProd NUMBER, p_idProv NUMBER, p_cant NUMBER, p_min NUMBER, p_costo NUMBER);
     FUNCTION InfoProducto(p_idProducto NUMBER) RETURN SYS_REFCURSOR;
     FUNCTION ConsultarStock(p_idProducto NUMBER) RETURN NUMBER;
 END pqProductos;
@@ -42,13 +41,8 @@ CREATE OR REPLACE PACKAGE BODY pqProductos AS
     BEGIN
         DELETE FROM Inventario 
         WHERE idProducto = p_idProducto;
-        COMMIT;
-    END;
-
-    PROCEDURE InsertarInventario(p_idProd NUMBER, p_idProv NUMBER, p_cant NUMBER, p_min NUMBER, p_costo NUMBER) IS
-    BEGIN
-        INSERT INTO Inventario (idProducto, idProveedor, cantidadDisponible, cantidadMinima, costoUnitario, ultimaFechaIngreso)
-        VALUES (p_idProd, p_idProv, p_cant, p_min, p_costo, SYSDATE);
+        DELETE FROM Producto 
+        WHERE idProducto = p_idProducto;
         COMMIT;
     END;
 
@@ -56,7 +50,7 @@ CREATE OR REPLACE PACKAGE BODY pqProductos AS
         v_cursor SYS_REFCURSOR;
     BEGIN
         OPEN v_cursor FOR SELECT * 
-        FROM Producto 
+        FROM vista_productos_completa 
         WHERE idProducto = p_idProducto;
         RETURN v_cursor;
     END;
@@ -79,8 +73,9 @@ CREATE OR REPLACE PACKAGE pqUsuarios AS
         FROM Usuario u 
         JOIN Rol r ON u.idRol = r.idRol;
 
+    FUNCTION listarRoles RETURN SYS_REFCURSOR;
     PROCEDURE ListarUsuarios(p_cursor OUT SYS_REFCURSOR);
-    PROCEDURE CrearUsuario(p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_correo VARCHAR2, p_password VARCHAR2);
+    PROCEDURE CrearUsuario(p_idRol NUMBER, p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_apellido2 VARCHAR2, p_correo VARCHAR2, p_telefono VARCHAR2, p_direccion VARCHAR2, p_password VARCHAR2);
     PROCEDURE ActualizarUsuario(p_idUsuario NUMBER, p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_correo VARCHAR2, p_telefono VARCHAR2, p_direccion VARCHAR2);
     PROCEDURE EliminarUsuario(p_idUsuario NUMBER);
     FUNCTION ValidarLogin(p_correo VARCHAR2, p_password VARCHAR2) RETURN NUMBER;
@@ -88,6 +83,14 @@ END pqUsuarios;
 /
 
 CREATE OR REPLACE PACKAGE BODY pqUsuarios AS
+    FUNCTION listarRoles RETURN SYS_REFCURSOR IS
+        v_cursor SYS_REFCURSOR;
+    BEGIN
+        OPEN v_cursor FOR
+        SELECT idRol, Nombre FROM Rol;
+        RETURN v_cursor;
+    END;
+
     PROCEDURE ListarUsuarios(p_cursor OUT SYS_REFCURSOR) IS
     BEGIN
         OPEN p_cursor FOR
@@ -96,10 +99,10 @@ CREATE OR REPLACE PACKAGE BODY pqUsuarios AS
             JOIN Rol r ON u.idRol = r.idRol;
     END;
 
-    PROCEDURE CrearUsuario(p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_correo VARCHAR2, p_password VARCHAR2) IS
+    PROCEDURE CrearUsuario(p_idRol NUMBER, p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_apellido2 VARCHAR2, p_correo VARCHAR2, p_telefono VARCHAR2, p_direccion VARCHAR2, p_password VARCHAR2) IS
     BEGIN
-        INSERT INTO Usuario (idRol, nombre, apellido1, correo, password)
-        VALUES (2, p_nombre, p_apellido1, p_correo, p_password);
+        INSERT INTO Usuario (idRol, nombre, apellido1, apellido2, correo, telefono, direccion, password)
+        VALUES (p_idRol, p_nombre, p_apellido1, p_apellido2, p_correo, p_telefono, p_direccion, p_password);
         COMMIT;
     END;
 
@@ -119,9 +122,15 @@ CREATE OR REPLACE PACKAGE BODY pqUsuarios AS
 
     PROCEDURE EliminarUsuario(p_idUsuario NUMBER) IS
     BEGIN
-        DELETE FROM Usuario 
-        WHERE idUsuario = p_idUsuario;
+        DELETE FROM DetallePedido WHERE idPedido IN (
+            SELECT idPedido FROM Pedido Where idUsuario = p_idUsuario);
+        DELETE FROM Pedido WHERE idUsuario = p_idUsuario;
+        DELETE FROM Usuario WHERE idUsuario = p_idUsuario;
         COMMIT;
+    EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE_APPLICATION_ERROR(-20099, 'Error al eliminar el usuario: ' || SQLERRM);
     END;
 
     FUNCTION ValidarLogin(p_correo VARCHAR2, p_password VARCHAR2) RETURN NUMBER IS

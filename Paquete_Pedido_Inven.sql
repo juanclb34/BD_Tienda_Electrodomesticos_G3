@@ -3,26 +3,13 @@
 CREATE OR REPLACE PACKAGE pqPedidos AS
 
 -- Procedimientos
-PROCEDURE agregarProductoPedido(
-    p_idPedido NUMBER,
-    p_idProducto NUMBER,
-    p_cantidad NUMBER
-);
-
-PROCEDURE verDetallePedido(
-    p_idPedido NUMBER,
-    p_cursor OUT SYS_REFCURSOR
-);
-
+PROCEDURE agregarProductoPedido(p_idPedido NUMBER,p_idProducto NUMBER,p_cantidad NUMBER);
+PROCEDURE verDetallePedido(p_idPedido NUMBER,p_cursor OUT SYS_REFCURSOR);
+PROCEDURE eliminarProductoPedido(p_idPedido NUMBER, p_idProducto NUMBER);
+PROCEDURE actualizarCantidadPedido(p_idPedido NUMBER, p_idProducto NUMBER, p_nuevaCantidad NUMBER);
 -- Funciones
-FUNCTION crearPedido(
-    p_idUsuario NUMBER
-) RETURN NUMBER;
-
-FUNCTION calcularTotalPedido(
-    p_idPedido NUMBER
-) RETURN NUMBER;
-
+FUNCTION crearPedido(p_idUsuario NUMBER) RETURN NUMBER;
+FUNCTION calcularTotalPedido(p_idPedido NUMBER) RETURN NUMBER;
 END pqPedidos;
 /
 
@@ -82,6 +69,26 @@ BEGIN
         FROM DetallePedido dp
         JOIN Producto pr ON dp.idProducto = pr.idProducto
         WHERE dp.idPedido = p_idPedido;
+END;
+
+PROCEDURE eliminarProductoPedido(p_idPedido NUMBER, p_idProducto NUMBER) IS
+BEGIN
+    DELETE FROM DetallePedido 
+    WHERE idPedido = p_idPedido AND idProducto = p_idProducto;
+    IF SQL%ROWCOUNT = 0 THEN
+        RAISE_APPLICATION_ERROR(-20004, 'El producto no estaba en el pedido.');
+    END IF;
+END;
+
+PROCEDURE actualizarCantidadPedido(p_idPedido NUMBER, p_idProducto NUMBER, p_nuevaCantidad NUMBER) IS
+BEGIN
+    UPDATE DetallePedido 
+    SET cantidad = p_nuevaCantidad
+    WHERE idPedido = p_idPedido AND idProducto = p_idProducto;
+
+    IF SQL%ROWCOUNT = 0 THEN
+        RAISE_APPLICATION_ERROR(-20005, 'No se pudo actualizar: producto no encontrado.');
+    END IF;
 END;
 
 -- FUNCION calcular total
@@ -230,25 +237,11 @@ WHERE IDPEDIDO = 3;
 CREATE OR REPLACE PACKAGE pqInventario AS
 
 -- Procedimientos
-PROCEDURE aumentarStock(
-    p_idProducto NUMBER,
-    p_cantidad NUMBER
-);
-
-PROCEDURE ajusteManualStock(
-    p_idProducto NUMBER,
-    p_cantidad NUMBER
-);
-
-PROCEDURE actualizarPrecioUnitario(
-    p_idProducto NUMBER,
-    p_precio NUMBER
-);
-
+PROCEDURE aumentarStock(p_idProducto NUMBER,p_cantidad NUMBER);
+PROCEDURE ajusteManualStock(p_idProducto NUMBER,p_cantidad NUMBER);
+PROCEDURE actualizarPrecioUnitario(p_idProducto NUMBER,p_precio NUMBER);
 -- Función
-FUNCTION consultarStock(
-    p_idProducto NUMBER
-) RETURN NUMBER;
+FUNCTION consultarStock(p_idProducto NUMBER) RETURN NUMBER;
 
 END pqInventario;
 /

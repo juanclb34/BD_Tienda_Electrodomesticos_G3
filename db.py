@@ -106,6 +106,66 @@ def eliminar_producto(id_producto):
     cursor.close()
     conn.close()
 
+def crearProducto(datos):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.callproc("pqProductos.CrearProductoInventario", [
+        datos["marca"],
+        datos["categoria"],
+        datos["nombre"],
+        datos["modelo"],
+        datos["descripcion"],
+        datos["proveedor"],
+        datos["cantidad"],
+        datos["minimo"],
+        datos["costo"]
+    ])
+
+    cursor.close()
+    conn.close()
+
+def obtenerProveedores():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    ref_cursor = cursor.callfunc("pqInventario.ObtenerProveedores",
+        oracledb.CURSOR)
+
+    datos = ref_cursor.fetchall()
+
+    ref_cursor.close()
+    cursor.close()
+    conn.close()
+
+    return datos
+
+def obtenerMarcas():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    ref_cursor = cursor.callfunc("pqInventario.ObtenerMarcas", oracledb.CURSOR)
+    datos = ref_cursor.fetchall()
+
+    ref_cursor.close()
+    cursor.close()
+    conn.close()
+
+    return datos
+
+def obtenerCategorias():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    ref_cursor = cursor.callfunc("pqInventario.ObtenerCategorias", oracledb.CURSOR)
+    datos = ref_cursor.fetchall()
+
+    ref_cursor.close()
+    cursor.close()
+    conn.close()
+
+    return datos
+
 def obtener_usuarios():
     conn = get_connection()
     cursor = conn.cursor()

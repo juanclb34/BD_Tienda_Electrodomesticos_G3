@@ -6,6 +6,16 @@ CREATE OR REPLACE PACKAGE pqProductos AS
         JOIN Categoria c ON p.idCategoria = c.idCategoria
         JOIN Inventario i ON p.idProducto = i.idProducto;
 
+    PROCEDURE CrearProductoInventario(
+        p_idMarca NUMBER,
+        p_idCategoria NUMBER,
+        p_nombre VARCHAR2,
+        p_modelo VARCHAR2,
+        p_descripcion VARCHAR2,
+        p_idProveedor NUMBER,
+        p_cantidad NUMBER,
+        p_minimo NUMBER,
+        p_costo NUMBER);
     PROCEDURE MostrarProductos(p_cursor OUT SYS_REFCURSOR);
     PROCEDURE BuscarProducto(p_criterio VARCHAR2,p_cursor OUT SYS_REFCURSOR);
     PROCEDURE EliminarProducto(p_idProducto NUMBER);
@@ -15,6 +25,34 @@ END pqProductos;
 /
 
 CREATE OR REPLACE PACKAGE BODY pqProductos AS
+    PROCEDURE CrearProductoInventario(
+        p_idMarca NUMBER,
+        p_idCategoria NUMBER,
+        p_nombre VARCHAR2,
+        p_modelo VARCHAR2,
+        p_descripcion VARCHAR2,
+        p_idProveedor NUMBER,
+        p_cantidad NUMBER,
+        p_minimo NUMBER,
+        p_costo NUMBER) 
+    IS
+        v_idProducto NUMBER;
+    BEGIN
+        INSERT INTO Producto (idMarca, idCategoria, nombre, modelo, descripcion)
+        VALUES (p_idMarca, p_idCategoria, p_nombre, p_modelo, p_descripcion)
+        RETURNING idProducto INTO v_idProducto;
+
+        INSERT INTO Inventario (idProducto, idProveedor, cantidadDisponible, cantidadMinima, costoUnitario, ultimaFechaIngreso) VALUES
+        (v_idProducto, p_idProveedor, p_cantidad, p_minimo, p_costo, SYSDATE);
+    
+        COMMIT;
+    
+    EXCEPTION
+        WHEN OTHERS THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20040, 'Error al crear producto: ' || SQLERRM);
+    END;
+
     PROCEDURE MostrarProductos(p_cursor OUT SYS_REFCURSOR) IS
     BEGIN
         OPEN p_cursor FOR

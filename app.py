@@ -91,6 +91,37 @@ def actualizarPrecio(idProducto):
 
     return redirect("/productos")
 
+@app.route("/crearProducto", methods=["GET"])
+@login_required
+def vista_crear_producto():
+    proveedores = db.obtenerProveedores()
+    marcas = db.obtenerMarcas()
+    categorias = db.obtenerCategorias()
+
+    return render_template("crearProducto.html",
+        proveedores=proveedores,
+        marcas=marcas,
+        categorias=categorias)
+
+@app.route("/crearProducto", methods=["POST"])
+@login_required
+def crearProducto():
+    datos = {
+        "marca": request.form["marca"],
+        "categoria": request.form["categoria"],
+        "nombre": request.form["nombre"],
+        "modelo": request.form["modelo"],
+        "descripcion": request.form["descripcion"],
+        "proveedor": request.form["proveedor"],
+        "cantidad": request.form["cantidad"],
+        "minimo": request.form["minimo"],
+        "costo": request.form["costo"]
+    }
+
+    db.crearProducto(datos)
+
+    return redirect("/productos")
+
 @app.route("/usuarios")
 @login_required
 def usuarios():

@@ -242,6 +242,9 @@ PROCEDURE ajusteManualStock(p_idProducto NUMBER,p_cantidad NUMBER);
 PROCEDURE actualizarPrecioUnitario(p_idProducto NUMBER,p_precio NUMBER);
 -- Función
 FUNCTION consultarStock(p_idProducto NUMBER) RETURN NUMBER;
+FUNCTION ObtenerProveedores RETURN SYS_REFCURSOR;
+FUNCTION ObtenerMarcas RETURN SYS_REFCURSOR;
+FUNCTION ObtenerCategorias RETURN SYS_REFCURSOR;
 
 END pqInventario;
 /
@@ -315,6 +318,36 @@ BEGIN
     WHERE IDPRODUCTO = p_idProducto;
 
     RETURN v_stock;
+END;
+
+FUNCTION ObtenerProveedores RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT idProveedor, nombre
+        FROM Proveedor;
+
+    RETURN v_cursor;
+END;
+
+FUNCTION ObtenerMarcas RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT idMarca, nombre
+        FROM Marca;
+
+    RETURN v_cursor;
+END;
+
+FUNCTION ObtenerCategorias RETURN SYS_REFCURSOR IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR
+        SELECT idCategoria, nombre
+        FROM Categoria;
+
+    RETURN v_cursor;
 END;
 
 END pqInventario;

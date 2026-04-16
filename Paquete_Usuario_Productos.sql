@@ -78,7 +78,7 @@ CREATE OR REPLACE PACKAGE pqUsuarios AS
     PROCEDURE CrearUsuario(p_idRol NUMBER, p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_apellido2 VARCHAR2, p_correo VARCHAR2, p_telefono VARCHAR2, p_direccion VARCHAR2, p_password VARCHAR2);
     PROCEDURE ActualizarUsuario(p_idUsuario NUMBER, p_nombre VARCHAR2, p_apellido1 VARCHAR2, p_correo VARCHAR2, p_telefono VARCHAR2, p_direccion VARCHAR2);
     PROCEDURE EliminarUsuario(p_idUsuario NUMBER);
-    FUNCTION ValidarLogin(p_correo VARCHAR2, p_password VARCHAR2) RETURN NUMBER;
+    PROCEDURE ValidarLogin(p_correo VARCHAR2, p_password VARCHAR2, p_login OUT NUMBER);
 END pqUsuarios;
 /
 
@@ -133,13 +133,19 @@ CREATE OR REPLACE PACKAGE BODY pqUsuarios AS
         RAISE_APPLICATION_ERROR(-20099, 'Error al eliminar el usuario: ' || SQLERRM);
     END;
 
-    FUNCTION ValidarLogin(p_correo VARCHAR2, p_password VARCHAR2) RETURN NUMBER IS
-        v_idUsuario NUMBER;
+    PROCEDURE ValidarLogin(p_correo VARCHAR2, p_password VARCHAR2, p_login OUT NUMBER) IS
+        v_resultado NUMBER;
     BEGIN
-        SELECT idUsuario INTO v_idUsuario 
-        FROM Usuario WHERE correo = p_correo AND password = p_password;
-        RETURN v_idUsuario;
-    EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL;
+        SELECT COUNT(*) INTO v_resultado 
+        FROM Usuario u JOIN Rol r ON u.idRol = r.idRol
+        WHERE UPPER(u.correo) = UPPER(p_correo) AND u.password = p_password AND r.idRol = 1;
+        IF v_resultado = 1 THEN
+            p_login := 1;
+        ELSE
+            p_login := 0;
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        p_login := 0;
     END;
 END pqUsuarios;
 /

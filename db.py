@@ -15,6 +15,25 @@ def get_connection():
     )
     return connection
 
+def loginUsuario(correo, password):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    resultado = cursor.var(int)
+
+    cursor.callproc("pqUsuarios.ValidarLogin", [
+        correo,
+        password,
+        resultado
+    ])
+
+    valor = resultado.getvalue()
+
+    cursor.close()
+    conn.close()
+
+    return valor
+
 def obtener_productos():
     conn = get_connection()
     cursor = conn.cursor()

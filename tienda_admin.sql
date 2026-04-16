@@ -187,6 +187,8 @@ INSERT INTO Pago (idFactura,idMetodoPago,montoPagado,estadoPago) VALUES (2,3,107
 
 COMMIT;
 
+SELECT * FROM Rol;
+
 SELECT * FROM Usuario;
 
 SELECT * FROM Producto;

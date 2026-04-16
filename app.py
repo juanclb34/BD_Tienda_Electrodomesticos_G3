@@ -1,14 +1,43 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
+from functools import wraps
 import db
 
 app = Flask(__name__)
+app.secret_key = "3lectr0Tiend4"
 
-@app.route("/")
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "usuario" not in session:
+            return redirect("/")
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route("/", methods=["GET"])
+def login_view():
+    return render_template("login.html")
+
+@app.route("/login", methods=["POST"])
+def login():
+    correo = request.form["correo"]
+    password = request.form["password"]
+
+    resultado = db.loginUsuario(correo, password)
+
+    if resultado == 1:
+        session["usuario"] = correo
+        return redirect("/productos")
+    else:
+        return render_template("login.html", error="Credenciales de Administrador inválidas")
+
+@app.route("/productos")
+@login_required
 def productos():
     listaProductos = db.obtener_productos()
     return render_template("productos.html", productos=listaProductos)
 
 @app.route("/buscar", methods=["POST"])
+@login_required
 def buscarProductos():
     criterio = request.form["criterio"]
     resultados = db.buscar_productos(criterio)
@@ -20,6 +49,7 @@ def buscarProductos():
     return render_template("productos.html", productos=resultados, mensaje=mensaje)
 
 @app.route("/producto/<int:idProducto>")
+@login_required
 def infoProducto(idProducto):
     listaProductos = db.obtener_productos()
     producto = db.infoProducto(idProducto)
@@ -31,11 +61,13 @@ def infoProducto(idProducto):
     )
 
 @app.route("/eliminarProducto/<int:idProducto>", methods=["POST"])
+@login_required
 def eliminarProducto(idProducto):
     db.eliminar_producto(idProducto)
-    return redirect("/")
+    return redirect("/productos")
 
 @app.route("/aumentarStock/<int:idProducto>", methods=["POST"])
+@login_required
 def aumentarStock(idProducto):
     cantidad = int(request.form["cantidad"])
 
@@ -48,6 +80,7 @@ def aumentarStock(idProducto):
     return render_template("productos.html", productos=listaProductos)
 
 @app.route("/actualizarPrecio/<int:idProducto>", methods=["POST"])
+@login_required
 def actualizarPrecio(idProducto):
     precio = float(request.form["precio"])
 
@@ -56,19 +89,22 @@ def actualizarPrecio(idProducto):
     except Exception as e:
         print(e)
 
-    return redirect("/")
+    return redirect("/productos")
 
 @app.route("/usuarios")
+@login_required
 def usuarios():
     listaUsuarios = db.obtener_usuarios()
     return render_template("usuarios.html", usuarios=listaUsuarios)
 
 @app.route("/crearUsuario", methods=["GET"])
+@login_required
 def vista_crear_usuario():
     roles = db.obtener_roles()
     return render_template("crearUsuario.html", roles=roles)
 
 @app.route("/crearUsuario", methods=["POST"])
+@login_required
 def crearUsuario():
     idRol = request.form["rol"]
     nombre = request.form["nombre"]
@@ -87,9 +123,15 @@ def crearUsuario():
     return redirect("/usuarios")
 
 @app.route("/eliminarUsuario/<int:idUsuario>", methods=["POST"])
+@login_required
 def eliminarUsuario(idUsuario):
     db.eliminarUsuario(idUsuario)
     return redirect("/usuarios?msg=eliminado")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
 
 if __name__ == "__main__":
     app.run(debug=True)

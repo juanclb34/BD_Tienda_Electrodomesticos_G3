@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY pqFacturacion AS
     EXCEPTION
         WHEN OTHERS THEN
             ROLLBACK;
-            RAISE_APPLICATION_ERROR(-20115, 'Error: ' || SQLERRM);
+            RAISE_APPLICATION_ERROR(-20115, 'No se pudo generar la Factura. Error: ' || SQLERRM);
     END;
 
     PROCEDURE obtenerFactura(p_idFactura NUMBER, p_cursor OUT SYS_REFCURSOR) IS

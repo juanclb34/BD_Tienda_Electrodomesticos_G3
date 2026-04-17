@@ -201,36 +201,17 @@ SELECT * FROM Inventario;
 
 SELECT * FROM Proveedor;
 
-SELECT * FROM Pedido;
+SELECT * FROM Pedido WHERE idPedido = 23;
 
-SELECT * FROM detallePedido;
+SELECT * FROM detallePedido WHERE idPedido = 23;
 
 SELECT * FROM Factura;
 
 
-SELECT table_name FROM user_tables;
+INSERT INTO Pedido (idUsuario,fecha,estado) VALUES (3,SYSDATE,'Completado');
 
-
-
-
-
-
-INSERT INTO Producto (idMarca,idCategoria,nombre,modelo,descripcion) 
-VALUES (2,3,'Apple Watch','Series 7','Reloj Inteligente');
-
-COMMIT;
-
-INSERT INTO Inventario (idProducto,idProveedor,cantidadDisponible,cantidadMinima,costoUnitario,ultimaFechaIngreso) 
-VALUES (22,1,20,5,300.00,SYSDATE);
-
-INSERT INTO Pedido (idUsuario,fecha,estado) VALUES (22,SYSDATE,'En proceso');
-
-INSERT INTO DetallePedido VALUES (21,3,1,200.00);
-
-COMMIT;
-
-DELETE FROM Pedido WHERE idUsuario = 22
+INSERT INTO DetallePedido VALUES (23,3,1,200.00);
 
 BEGIN
-    pqUsuarios.EliminarUsuario(22);
+    pqFacturacion.generarFactura(23);
 END;

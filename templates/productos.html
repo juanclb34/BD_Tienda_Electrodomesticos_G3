@@ -23,7 +23,6 @@
 
 <table border="1">
 <tr>
-    <th>ID</th>
     <th>Nombre</th>
     <th>Marca</th>
     <th>Categoria</th>
@@ -33,7 +32,6 @@
 
 {% for p in productos %}
 <tr>
-    <td>{{ p[0] }}</td>
     <td>
         <a href="/producto/{{ p[0] }}">
             {{ p[1] }}
@@ -54,7 +52,6 @@
 
 <table border="1">
     <tr>
-        <th>ID</th>
         <th>Nombre</th>
         <th>Marca</th>
         <th>Categoria</th>
@@ -65,7 +62,6 @@
     </tr>
 
     <tr>
-        <td>{{ producto_seleccionado[0] }}</td>
         <td>{{ producto_seleccionado[1] }}</td>
         <td>{{ producto_seleccionado[2] }}</td>
         <td>{{ producto_seleccionado[3] }}</td>
